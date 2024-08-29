@@ -1,7 +1,6 @@
+'use client'
+
 import React, { useState, useEffect } from 'react';
-import { Camera, Aperture, Clock, Zap, RefreshCw, ArrowRight } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
 
 const scenarios = [
   {
@@ -120,10 +119,10 @@ const DSLRSimulator = () => {
 
   return (
     <div className="p-4 max-w-2xl mx-auto bg-gray-100 rounded-lg shadow-lg">
-      <Alert className="mb-4">
-        <AlertTitle>Current Scenario:</AlertTitle>
-        <AlertDescription>{currentScenario.name}</AlertDescription>
-      </Alert>
+      <div className="mb-4 bg-blue-100 p-4 rounded-lg">
+        <h2 className="text-xl font-bold">Current Scenario:</h2>
+        <p>{currentScenario.name}</p>
+      </div>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="bg-black text-white p-4 rounded-lg">
           <div className="grid grid-cols-3 gap-4 text-center mb-4">
@@ -132,21 +131,13 @@ const DSLRSimulator = () => {
             <div>ISO {settings.iso}</div>
           </div>
           <div className="grid grid-cols-3 gap-4">
-            <div className="flex flex-col items-center">
-              <Button onClick={() => changeSetting('aperture', 'up')} className="w-full mb-2">▲</Button>
-              <Aperture className="mb-2" />
-              <Button onClick={() => changeSetting('aperture', 'down')} className="w-full">▼</Button>
-            </div>
-            <div className="flex flex-col items-center">
-              <Button onClick={() => changeSetting('shutterSpeed', 'up')} className="w-full mb-2">▲</Button>
-              <Clock className="mb-2" />
-              <Button onClick={() => changeSetting('shutterSpeed', 'down')} className="w-full">▼</Button>
-            </div>
-            <div className="flex flex-col items-center">
-              <Button onClick={() => changeSetting('iso', 'up')} className="w-full mb-2">▲</Button>
-              <Zap className="mb-2" />
-              <Button onClick={() => changeSetting('iso', 'down')} className="w-full">▼</Button>
-            </div>
+            {['aperture', 'shutterSpeed', 'iso'].map((setting) => (
+              <div key={setting} className="flex flex-col items-center">
+                <button onClick={() => changeSetting(setting, 'up')} className="w-full mb-2 bg-blue-500 text-white p-2 rounded">▲</button>
+                <span className="mb-2">{setting.charAt(0).toUpperCase() + setting.slice(1)}</span>
+                <button onClick={() => changeSetting(setting, 'down')} className="w-full bg-blue-500 text-white p-2 rounded">▼</button>
+              </div>
+            ))}
           </div>
         </div>
         <div className="relative">
@@ -159,21 +150,15 @@ const DSLRSimulator = () => {
         </div>
       </div>
       <div className="flex justify-between items-center mb-4">
-        <Button onClick={takePicture} className="flex-1 mr-2">
-          <Camera className="mr-2" /> Take Picture
-        </Button>
-        <Button onClick={retryScenario} className="mr-2">
-          <RefreshCw className="mr-2" /> Retry
-        </Button>
-        <Button onClick={nextScenario}>
-          <ArrowRight className="mr-2" /> Next
-        </Button>
+        <button onClick={takePicture} className="flex-1 mr-2 bg-green-500 text-white p-2 rounded">Take Picture</button>
+        <button onClick={retryScenario} className="mr-2 bg-yellow-500 text-white p-2 rounded">Retry</button>
+        <button onClick={nextScenario} className="bg-blue-500 text-white p-2 rounded">Next</button>
       </div>
       {feedback && (
-        <Alert>
-          <AlertTitle>Feedback:</AlertTitle>
-          <AlertDescription>{feedback}</AlertDescription>
-        </Alert>
+        <div className="bg-yellow-100 p-4 rounded-lg">
+          <h3 className="font-bold">Feedback:</h3>
+          <p>{feedback}</p>
+        </div>
       )}
     </div>
   );
