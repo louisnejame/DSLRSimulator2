@@ -1,16 +1,18 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { scenarios, calculateScore, getDetailedFeedback, calculateExposureScore } from '../utils/simulatorUtils';
+import { scenarios, calculateScore, getDetailedFeedback } from '../utils/simulatorUtils';
 import ImageProcessor from './ImageProcessor';
 
 const DSLRSimulator2 = () => {
+  console.log("DSLRSimulator2 is rendering");
+
+  const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
   const [settings, setSettings] = useState({
     iso: 100,
     aperture: 1.4,
     shutterSpeed: '1/400'
   });
-  const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
   const [score, setScore] = useState(null);
   const [feedback, setFeedback] = useState('');
 
@@ -19,7 +21,7 @@ const DSLRSimulator2 = () => {
   const changeSetting = useCallback((setting, direction) => {
     const values = {
       iso: [100, 200, 400, 800, 1600, 3200, 6400],
-      aperture: [1.4, 2, 2.8, 4, 5.6, 8, 11, 16, 22],
+      aperture: [1.4, 2, 2.8, 4, 5.6, 8, 11, 16, 22, 32],
       shutterSpeed: ['1/4000', '1/2000', '1/1000', '1/500', '1/250', '1/125', '1/60', '1/30', '1/15', '1/8', '1/4', '1/2', '1']
     };
     
@@ -39,11 +41,9 @@ const DSLRSimulator2 = () => {
   }, []);
 
   const takePicture = useCallback(() => {
-    const settingsScore = calculateScore(settings, currentScenario.idealSettings);
-    const exposureScore = calculateExposureScore(settings, currentScenario.baseEV);
-    const combinedScore = Math.round((settingsScore + exposureScore) / 2);
+    const newScore = calculateScore(settings, currentScenario.idealSettings);
     const detailedFeedback = getDetailedFeedback(settings, currentScenario.idealSettings, currentScenario);
-    setScore(combinedScore);
+    setScore(newScore);
     setFeedback(detailedFeedback);
   }, [settings, currentScenario]);
 
@@ -65,37 +65,46 @@ const DSLRSimulator2 = () => {
       </div>
       
       <div className="grid grid-cols-2 gap-4">
-        <ImageProcessor settings={settings} scenario={currentScenario} />
         <div>
-          <div className="bg-gray-100 p-4 rounded-lg mb-4">
-            {['iso', 'aperture', 'shutterSpeed'].map((setting) => (
-              <div key={setting} className="flex items-center justify-between mb-2">
-                <span>{setting.charAt(0).toUpperCase() + setting.slice(1)}</span>
-                <div>
-                  <button 
-                    onClick={() => changeSetting(setting, 'down')}
-                    className="px-2 py-1 bg-gray-200 rounded-l"
-                  >
-                    -
-                  </button>
-                  <span className="px-4 py-1 bg-white">{settings[setting]}</span>
-                  <button 
-                    onClick={() => changeSetting(setting, 'up')}
-                    className="px-2 py-1 bg-gray-200 rounded-r"
-                  >
-                    +
-                  </button>
-                </div>
+          {['iso', 'aperture', 'shutterSpeed'].map((setting) => (
+            <div key={setting} className="flex items-center justify-between mb-2">
+              <span>{setting.charAt(0).toUpperCase() + setting.slice(1)}</span>
+              <div>
+                <button 
+                  onClick={() => changeSetting(setting, 'down')}
+                  className="px-2 py-1 bg-gray-200 rounded-l"
+                >
+                  -
+                </button>
+                <span className="px-4 py-1 bg-white">{settings[setting]}</span>
+                <button 
+                  onClick={() => changeSetting(setting, 'up')}
+                  className="px-2 py-1 bg-gray-200 rounded-r"
+                >
+                  +
+                </button>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
           <button 
             onClick={takePicture}
-            className="w-full px-4 py-2 bg-green-500 text-white rounded-lg"
+            className="mt-4 w-full px-4 py-2 bg-green-500 text-white rounded-lg"
           >
             Take Picture
           </button>
         </div>
+        
+        <div className="relative">
+          {/* Placeholder for exposure meter or other controls */}
+        </div>
+      </div>
+      
+      <div className="mt-4 relative">
+        <ImageProcessor 
+          imageUrl={currentScenario.imageUrl} 
+          settings={settings} 
+          scenario={currentScenario}
+        />
       </div>
       
       <div className="mt-4 bg-gray-100 p-4 rounded-lg">
